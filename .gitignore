@@ -1,0 +1,8 @@
+*.project
+*.pydevproject
+*.whl
+*.db
+resources/
+models/
+tfLogs/
+templates/
