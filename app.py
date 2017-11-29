@@ -4,8 +4,8 @@ Created on Nov 27, 2017
 @author: abhijit.tomar
 '''
 
-import os,sys
-sys.path.append(os.getcwd()+"/src")
+import os, sys
+sys.path.append(os.getcwd() + "/src")
 import tflearn
 from flask import Flask, render_template, request, jsonify
 from storage.SQLliteStorage import CNNSQL
@@ -18,10 +18,10 @@ app = Flask(__name__)
 classes = ["high", "low"]
 cnn_storage = CNNSQL()
 
-#cnn_storage.drop_table()
-#cnn_storage = CNNSQL()
+# cnn_storage.drop_table()
+# cnn_storage = CNNSQL()
 ConvNet = None
-current_model_name=""
+current_model_name = ""
 
 @app.route('/')
 def home():
@@ -30,30 +30,40 @@ def home():
 @app.route('/api/prepare', methods=['POST'])
 def prepare_for_cnn():
     
-    img_size=defaults.IMG_SIZE
+    img_size = defaults.IMAGE_SIZE
+    prepared_data_save_path = defaults.PREPARED_TRAINING_DATA
+    training_data_dir = defaults.TRAIN_DIR
     
     if('imageSize' in request.json):
         img_size = (int)(request.json['imageSize'])
+    if('inputDirOption' in request.json):
+        prepared_data_save_path = request.json['inputDirOption']
+    if('preparedDataDirOption' in request.json):
+        training_data_dir = request.json['preparedDataDirOption']
     
-    Prepare.create_train_data(img_size)
+    Prepare.create_train_data(img_size, prepared_data_save_path, training_data_dir)
     
     return 'Prepared Successfully'
 
 @app.route('/api/train', methods=['POST'])
 def train_cnn():
 
-    img_size=defaults.IMG_SIZE
+    img_size = defaults.IMG_SIZE
     learning_rate = defaults.LEARNING_RATE
+    model_save_path = defaults.MODEL_SAVE_PATH
     model_attributes = {}
     
     if('imageSize' in request.json):
         img_size = (int)(request.json['imageSize'])
-        model_attributes['imageSize']=img_size
+        model_attributes['img_size'] = img_size
     if('learningRate' in request.json):
         learning_rate = (float)(request.json['learningRate'])
-        model_attributes['learningRate']=learning_rate
+        model_attributes['learning'] = learning_rate
+    if('modelSavePathOption' in request.json):
+        learning_rate = (float)(request.json['modelSavePathOption'])
+        model_attributes['save_location'] = learning_rate
     
-    CatsAndDogsNetwork = CatsAndDogsCNN()
+    CatsAndDogsNetwork = CatsAndDogsCNN(model_attributes)
     
     CatsAndDogsNetwork.train()
     

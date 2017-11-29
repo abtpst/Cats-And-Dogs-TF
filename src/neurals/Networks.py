@@ -18,9 +18,9 @@ class CatsAndDogsCNN(object):
 
     def __init__(self, params=None):
         
-        self.img_size = defaults.IMG_SIZE
-        self.learning = defaults.LEARNING_RATE
-        self.save_location = defaults.MODEL_NAME
+        self.img_size = params['img_size']
+        self.learning = params['learning']
+        self.save_location = params['save_location']
         
         tf.reset_default_graph()
          
@@ -54,14 +54,14 @@ class CatsAndDogsCNN(object):
         
         self.model.save(self.save_location)
             
-    def train(self,model_name=defaults.MODEL_NAME):
+    def train(self,model_name=defaults.MODEL_SAVE_PATH):
         
         tf.reset_default_graph()
         
         self.model.load(model_name)
         print('model loaded')
         
-        X,Y,test_x,test_y = Prepare.get_data_for_fitting()
+        X,Y,test_x,test_y = Prepare.get_data_for_fitting(img_size=self.img_size)
         
         self.model.fit({'input': X}, {'targets': Y}, n_epoch=3, validation_set=({'input': test_x}, {'targets': test_y}), 
           snapshot_step=500, show_metric=True, run_id=model_name)
