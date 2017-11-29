@@ -74,7 +74,7 @@ def train_cnn():
     
     CatsAndDogsNetwork = CatsAndDogsCNN(model_attributes)
     
-    #CatsAndDogsNetwork.train()
+    CatsAndDogsNetwork.train(model_save_path)
     
     return 'Trained Successfully'
 
