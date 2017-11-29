@@ -18,9 +18,10 @@ class CatsAndDogsCNN(object):
 
     def __init__(self, params=None):
         
-        self.img_size = params['img_size']
+        self.img_size = params['imageSize']
         self.learning = params['learning']
-        self.save_location = params['save_location']
+        self.save_location = params['modelSavePath']
+        self.epochs = params['epochs']
         
         tf.reset_default_graph()
          
@@ -63,7 +64,7 @@ class CatsAndDogsCNN(object):
         
         X,Y,test_x,test_y = Prepare.get_data_for_fitting(img_size=self.img_size)
         
-        self.model.fit({'input': X}, {'targets': Y}, n_epoch=3, validation_set=({'input': test_x}, {'targets': test_y}), 
+        self.model.fit({'input': X}, {'targets': Y}, n_epoch=self.epochs, validation_set=({'input': test_x}, {'targets': test_y}), 
           snapshot_step=500, show_metric=True, run_id=model_name)
     
         self.model.save(model_name)

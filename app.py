@@ -48,24 +48,33 @@ def prepare_for_cnn():
 @app.route('/api/train', methods=['POST'])
 def train_cnn():
 
-    img_size = defaults.IMG_SIZE
+    img_size = defaults.IMAGE_SIZE
+    epochs = defaults.EPOCHS
     learning_rate = defaults.LEARNING_RATE
     model_save_path = defaults.MODEL_SAVE_PATH
     model_attributes = {}
     
     if('imageSize' in request.json):
         img_size = (int)(request.json['imageSize'])
-        model_attributes['img_size'] = img_size
+        
+    if('epochs' in request.json):
+        epochs = (int)(request.json['epochs'])
+        
     if('learningRate' in request.json):
         learning_rate = (float)(request.json['learningRate'])
-        model_attributes['learning'] = learning_rate
-    if('modelSavePathOption' in request.json):
-        learning_rate = (float)(request.json['modelSavePathOption'])
-        model_attributes['save_location'] = learning_rate
+        
+    if('modelSavePath' in request.json):
+        model_save_path = request.json['modelSavePath']
+        model_save_path = model_save_path + "-" + str(learning_rate) + "-" + str(epochs)
+
+    model_attributes['imageSize'] = img_size
+    model_attributes['epochs'] = epochs
+    model_attributes['learning'] = learning_rate
+    model_attributes['modelSavePath'] = model_save_path
     
     CatsAndDogsNetwork = CatsAndDogsCNN(model_attributes)
     
-    CatsAndDogsNetwork.train()
+    #CatsAndDogsNetwork.train()
     
     return 'Trained Successfully'
 
