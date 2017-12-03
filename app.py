@@ -18,9 +18,9 @@ app = Flask(__name__)
 classes = ["high", "low"]
 cnn_storage = CNNSQL()
 
-# cnn_storage.drop_table()
-# cnn_storage = CNNSQL()
-ConvNet = None
+#cnn_storage.drop_table()
+#cnn_storage = CNNSQL()
+CatsAndDogsNetwork = None
 current_model_name = ""
 
 @app.route('/')
@@ -52,8 +52,12 @@ def train_cnn():
     epochs = defaults.EPOCHS
     learning_rate = defaults.LEARNING_RATE
     model_save_path = defaults.MODEL_SAVE_PATH
+    split = defaults.SPLIT
     model_attributes = {}
     
+    if('split' in request.json):
+        split = (float)(request.json['split'])
+
     if('imageSize' in request.json):
         img_size = (int)(request.json['imageSize'])
         
@@ -67,10 +71,14 @@ def train_cnn():
         model_save_path = request.json['modelSavePath']
         model_save_path = model_save_path + "-" + str(learning_rate) + "-" + str(epochs)
 
+    model_attributes['split']=split
     model_attributes['imageSize'] = img_size
     model_attributes['epochs'] = epochs
-    model_attributes['learning'] = learning_rate
+    model_attributes['learningRate'] = learning_rate
     model_attributes['modelSavePath'] = model_save_path
+    model_attributes['name']="cnd-split{}-epochs{}-lr{}".format(split,epochs,learning_rate)
+    
+    cnn_storage.add_new_model(model_attributes)
     
     CatsAndDogsNetwork = CatsAndDogsCNN(model_attributes)
     
@@ -80,7 +88,7 @@ def train_cnn():
 
 @app.route('/api/getModels', methods=['POST'])
 def get_models():
-
+    print("Current models are ",cnn_storage.get_names())
     return jsonify(cnn_storage.get_names())
 
 @app.route('/api/test', methods=['POST'])

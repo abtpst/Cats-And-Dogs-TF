@@ -23,13 +23,13 @@ class CNNSQL(object):
             conn.execute('''CREATE TABLE IF NOT EXISTS {} (
                         split REAL, 
                         epochs INTEGER, 
-                        windowSize INTEGER, 
-                        windowStride INTEGER, 
                         imageSize INTEGER,
-                        learningRate REAL
+                        learningRate REAL,
                         name TEXT)'''.format(self.table_name))
             print ("Table created successfully");
-        
+            cur = conn.cursor()
+            cur.execute('select * from {}'.format(self.table_name))
+            print([description[0] for description in cur.description])
             conn.close()
         except Error as e:
             print(e)
@@ -48,16 +48,12 @@ class CNNSQL(object):
                             INSERT INTO {} (
                             split, 
                             epochs, 
-                            windowSize, 
-                            windowStride, 
                             imageSize,
                             learningRate,
-                            name) VALUES (?,?,?,?,?,?,?)'''.format(self.table_name),
+                            name) VALUES (?,?,?,?,?)'''.format(self.table_name),
                             (
                             model_attributes['split'],
                             model_attributes['epochs'],
-                            model_attributes['windowSize'],
-                            model_attributes['windowStride'],
                             model_attributes['imageSize'],
                             model_attributes['learningRate'],
                             model_attributes['name']))
@@ -68,9 +64,7 @@ class CNNSQL(object):
                     UPDATE {}
                     SET 
                         split = ?, 
-                        epochs = ?, 
-                        windowSize = ?, 
-                        windowStride = ?, 
+                        epochs = ?,
                         imageSize = ?,
                         learningRate = ?
                      WHERE    
@@ -78,8 +72,6 @@ class CNNSQL(object):
                     '''.format(self.table_name),
                     (model_attributes['split'],
                     model_attributes['epochs'],
-                    model_attributes['windowSize'],
-                    model_attributes['windowStride'],
                     model_attributes['imageSize'],
                     model_attributes['learningRate'],
                     model_attributes['name']))

@@ -15,16 +15,15 @@ class CatsAndDogsCNN(object):
     '''
     classdocs
     '''
-
-
+    
     def __init__(self, params=None):
         
         self.img_size = params['imageSize']
-        self.learning = params['learning']
+        self.learning = params['learningRate']
         self.save_location = params['modelSavePath']
         self.epochs = params['epochs']
         
-        tf.reset_default_graph()
+        #tf.reset_default_graph()
              
         convnet = input_data(shape=[None, self.img_size, self.img_size, 1], name='input')
         
