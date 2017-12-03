@@ -18,8 +18,8 @@ app = Flask(__name__)
 classes = ["high", "low"]
 cnn_storage = CNNSQL()
 
-#cnn_storage.drop_table()
-#cnn_storage = CNNSQL()
+cnn_storage.drop_table()
+cnn_storage = CNNSQL()
 CatsAndDogsNetwork = None
 current_model_name = ""
 
@@ -69,7 +69,6 @@ def train_cnn():
         
     if('modelSavePath' in request.json):
         model_save_path = request.json['modelSavePath']
-        model_save_path = model_save_path + "-" + str(learning_rate) + "-" + str(epochs)
 
     model_attributes['split']=split
     model_attributes['imageSize'] = img_size
@@ -78,11 +77,11 @@ def train_cnn():
     model_attributes['modelSavePath'] = model_save_path
     model_attributes['name']="cnd-split{}-epochs{}-lr{}".format(split,epochs,learning_rate)
     
-    cnn_storage.add_new_model(model_attributes)
-    
     CatsAndDogsNetwork = CatsAndDogsCNN(model_attributes)
-    
+    model_save_path = model_save_path + model_attributes['name']
     CatsAndDogsNetwork.train(model_save_path)
+    
+    cnn_storage.add_new_model(model_attributes)
     
     return 'Trained Successfully'
 

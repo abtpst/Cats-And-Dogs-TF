@@ -23,7 +23,7 @@ class CatsAndDogsCNN(object):
         self.save_location = params['modelSavePath']
         self.epochs = params['epochs']
         
-        #tf.reset_default_graph()
+        tf.reset_default_graph()
              
         convnet = input_data(shape=[None, self.img_size, self.img_size, 1], name='input')
         
@@ -53,14 +53,15 @@ class CatsAndDogsCNN(object):
                 
         self.model = tflearn.DNN(self.convnet, tensorboard_dir=defaults.TF_LOGS)
             
-    def train(self,model_name=defaults.MODEL_SAVE_PATH):
+    def train(self,model_save_path):
         
-        self.model.load(model_name)
-        print('model loaded')
+        if os.path.exists(model_save_path + ".meta"):
+            self.model.load(model_save_path)
+            print('model loaded')
         
         X,Y,test_x,test_y = Prepare.get_data_for_fitting(img_size=self.img_size)
-        
+        model_name = model_save_path[model_save_path.rindex('/')+1:]
         self.model.fit({'input': X}, {'targets': Y}, n_epoch=self.epochs, validation_set=({'input': test_x}, {'targets': test_y}), 
           snapshot_step=500, show_metric=True, run_id=model_name)
     
-        self.model.save(model_name)
+        self.model.save(model_save_path)
