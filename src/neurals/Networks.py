@@ -20,7 +20,10 @@ class CatsAndDogsCNN(object):
         
         self.img_size = params['imageSize']
         self.learning = params['learningRate']
-        self.save_location = params['modelSavePath']
+        if 'modelSavePath' in params:
+            self.save_location = params['modelSavePath']
+        else:
+            self.save_location = defaults.MODEL_SAVE_PATH
         self.epochs = params['epochs']
         
         tf.reset_default_graph()
@@ -53,15 +56,29 @@ class CatsAndDogsCNN(object):
                 
         self.model = tflearn.DNN(self.convnet, tensorboard_dir=defaults.TF_LOGS)
             
-    def train(self,model_save_path):
+    def train(self, model_save_path):
         
         if os.path.exists(model_save_path + ".meta"):
             self.model.load(model_save_path)
             print('model loaded')
         
-        X,Y,test_x,test_y = Prepare.get_data_for_fitting(img_size=self.img_size)
-        model_name = model_save_path[model_save_path.rindex('/')+1:]
-        self.model.fit({'input': X}, {'targets': Y}, n_epoch=self.epochs, validation_set=({'input': test_x}, {'targets': test_y}), 
+        X, Y, test_x, test_y = Prepare.get_data_for_fitting(img_size=self.img_size)
+        model_name = model_save_path[model_save_path.rindex('/') + 1:]
+        self.model.fit({'input': X}, {'targets': Y}, n_epoch=self.epochs, validation_set=({'input': test_x}, {'targets': test_y}),
           snapshot_step=500, show_metric=True, run_id=model_name)
     
         self.model.save(model_save_path)
+    
+    def test(self, model_save_path, img_name, img_size):
+        
+        if os.path.exists(model_save_path + ".meta"):
+            self.model.load(model_save_path)
+            print('model loaded')
+        
+        img_path = defaults.TEST_IMAGES + img_name
+        
+        test_input = Prepare.format_single_image_for_testing(img_path, img_size)
+        
+        pred = self.model.predict(test_input)
+        
+        return pred

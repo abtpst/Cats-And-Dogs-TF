@@ -18,10 +18,8 @@ app = Flask(__name__)
 classes = ["high", "low"]
 cnn_storage = CNNSQL()
 
-cnn_storage.drop_table()
-cnn_storage = CNNSQL()
-CatsAndDogsNetwork = None
-current_model_name = ""
+#cnn_storage.drop_table()
+#cnn_storage = CNNSQL()
 
 @app.route('/')
 def home():
@@ -97,30 +95,19 @@ def test_cnn():
     expectedClass = request.json['expectedClass']
     modelName = request.json['modelName']
     clusters = (int)(request.json['clusters'])
-    '''
-    global ConvNet
-    global current_model_name
-    if ConvNet is None or current_model_name != modelName:
-        model_attributes = cnn_storage.get_attributes(modelName)
-        ConvNet = conv2(
-                windowSize=model_attributes['windowSize'],
-                stride=model_attributes['windowStride'],
-                n_classes= len(classes),
-                imageSize=model_attributes['imageSize'],
-                runs=model_attributes['numRuns'],
-                saveLocation=common.MODEL_LOCATION,
-                keep=0.5,
-                split=model_attributes['split'],
-                epochs=model_attributes['epochs'],
-                learningRate=model_attributes['learningRate'])
-        current_model_name = modelName
-
-   
-    analysis = ConvNet.analyze_image("../resources/test/"+expectedClass+"/"+fileName,modelName,clusters)
     
-    return jsonify(analysis)
-    '''
-    return ''
+    model_attributes = cnn_storage.get_attributes(modelName)
+    
+    CatsAndDogsNetwork = CatsAndDogsCNN(model_attributes)
+    
+    prediction_array = CatsAndDogsNetwork.test(modelName, fileName, model_attributes['imageSize'])
+    
+    prediction_prob = prediction_array[0]
+    
+    if prediction_prob[0] > prediction_prob[1]:
+        return 'CAT'
+    else:
+        return 'DOG'
     
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8008, debug=True)

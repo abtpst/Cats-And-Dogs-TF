@@ -61,3 +61,10 @@ def get_data_for_fitting(img_size=defaults.IMAGE_SIZE,prepared_data_save_path=de
     test_y = [i[1] for i in test]
     
     return X,Y,test_x,test_y 
+
+def format_single_image_for_testing(img_path,img_size=defaults.IMAGE_SIZE):
+    
+    img = cv2.resize(cv2.imread(img_path,cv2.IMREAD_GRAYSCALE),(img_size,img_size))
+    img_num = img_path[img_path.rindex('/')+1:img_path.rindex('.')]
+    X = np.array(img).reshape(-1,img_size,img_size,1)
+    return X
